@@ -24,13 +24,7 @@ Built as a transparent, auditable alternative to proprietary sandbox images.
 docker compose up
 
 # Or run directly
-docker run -d \
-  --name agent-sandbox \
-  --shm-size=2gb \
-  --security-opt seccomp:unconfined \
-  -p 8080:8080 \
-  -v agent-workspace:/workspace \
-  ghcr.io/mafshin/agent-sandbox:latest
+docker run -d --name agent-sandbox --shm-size=2gb --security-opt seccomp:unconfined -p 8080:8080 -v agent-workspace:/workspace ghcr.io/mafshin/agent-sandbox:latest
 ```
 
 Open **http://localhost:8080** for VSCode.
@@ -101,4 +95,21 @@ supervisord (PID 1)
 
 ## License
 
-MIT
+This project is licensed under the **Apache License 2.0** — see [LICENSE](LICENSE) for the full text.
+
+### Third-party components
+
+The Docker image bundles the following open-source components. Each runs as a separate process and is not linked into this project's code.
+
+| Component | License | Source |
+|-----------|---------|--------|
+| [code-server](https://github.com/coder/code-server) | MIT | github.com/coder/code-server |
+| [noVNC](https://github.com/novnc/noVNC) | MPL-2.0 | github.com/novnc/noVNC |
+| [websockify](https://github.com/novnc/websockify) | LGPL-3.0 | github.com/novnc/websockify |
+| [agent-browser](https://www.npmjs.com/package/agent-browser) | Apache-2.0 | npmjs.com/package/agent-browser |
+| nginx | BSD-2-Clause | nginx.org |
+| supervisor | BSD-derived | supervisord.org |
+| Chromium | BSD + others | chromium.org |
+| x11vnc | GPL-2.0 | libvncserver.github.io/LibVNCServer |
+
+**Note on x11vnc (GPL-2.0):** x11vnc is installed as a standard Ubuntu apt package. Its source code is available via Ubuntu's package repositories, satisfying GPL-2.0 distribution requirements.
