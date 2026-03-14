@@ -7,7 +7,7 @@
 # ─── Stage 1: builder ────────────────────────────────────────────────────────
 FROM ubuntu:22.04 AS builder
 
-ARG CODE_SERVER_VERSION=4.101.2
+ARG CODE_SERVER_VERSION=4.104.0
 ARG NOVNC_VERSION=1.5.0
 ARG WEBSOCKIFY_VERSION=0.12.0
 
@@ -67,6 +67,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     gosu \
     locales \
     tzdata \
+    x11-utils \
     && locale-gen en_US.UTF-8 \
     && rm -rf /var/lib/apt/lists/*
 
@@ -99,9 +100,6 @@ RUN mkdir -p /home/agent/.config/chromium/agent && \
 
 # ── Workspace directory ───────────────────────────────────────────────────────
 RUN mkdir -p /workspace && chown agent:agent /workspace
-
-# ── npm global bin on PATH for agent user ─────────────────────────────────────
-ENV PATH="/usr/local/lib/node_modules/.bin:/home/agent/.npm-global/bin:${PATH}"
 
 # ── Copy configs ──────────────────────────────────────────────────────────────
 COPY config/nginx.conf        /etc/nginx/nginx.conf
