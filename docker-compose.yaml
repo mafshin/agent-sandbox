@@ -1,0 +1,23 @@
+services:
+  sandbox:
+    image: ghcr.io/mafshin/agent-sandbox:latest
+    container_name: agent-sandbox
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "${PORT:-8080}:8080"
+    shm_size: "2gb"
+    security_opt:
+      - seccomp:unconfined   # required for Chromium inside Docker
+    environment:
+      TZ:             ${TZ:-UTC}
+      WORKSPACE:      ${WORKSPACE:-/workspace}
+      DISPLAY_WIDTH:  ${DISPLAY_WIDTH:-1280}
+      DISPLAY_HEIGHT: ${DISPLAY_HEIGHT:-1024}
+    volumes:
+      - workspace:/workspace   # persists on-startup.sh and user files
+    restart: unless-stopped
+
+volumes:
+  workspace:
