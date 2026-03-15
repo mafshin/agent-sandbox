@@ -5,7 +5,7 @@
 # Run:    docker compose up
 
 # ─── Stage 1: builder ────────────────────────────────────────────────────────
-FROM ubuntu:22.04 AS builder
+FROM debian:bookworm-slim AS builder
 
 ARG CODE_SERVER_VERSION=4.104.0
 ARG NOVNC_VERSION=1.5.0
@@ -29,10 +29,10 @@ RUN git clone --depth=1 --branch v${NOVNC_VERSION} \
     https://github.com/novnc/websockify.git /opt/novnc/utils/websockify
 
 # ─── Stage 2: final ──────────────────────────────────────────────────────────
-FROM ubuntu:22.04
+FROM debian:bookworm-slim
 
 LABEL org.opencontainers.image.title="agent-sandbox"
-LABEL org.opencontainers.image.description="Lightweight developer sandbox: VSCode + Chromium + agent-browser"
+LABEL org.opencontainers.image.description="Lightweight developer sandbox: VSCode + Chromium + agent-browser (Debian Bookworm)"
 LABEL org.opencontainers.image.source="https://github.com/mafshin/agent-sandbox"
 
 ENV DEBIAN_FRONTEND=noninteractive
@@ -46,7 +46,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     xvfb \
     x11vnc \
     # Browser
-    chromium-browser \
+    chromium \
     # Process manager & web server
     supervisor \
     nginx \
@@ -91,7 +91,7 @@ RUN dpkg -i /tmp/code-server.deb && rm /tmp/code-server.deb
 
 # ── noVNC + websockify ────────────────────────────────────────────────────────
 COPY --from=builder /opt/novnc /opt/novnc
-RUN pip3 install --no-cache-dir websockify
+RUN pip3 install --no-cache-dir --break-system-packages websockify
 
 # ── Create agent user ─────────────────────────────────────────────────────────
 RUN useradd -m -s /bin/bash -u 1000 agent && \
@@ -115,9 +115,10 @@ COPY config/code-server.yaml  /home/agent/.config/code-server/config.yaml
 # ── Copy scripts ──────────────────────────────────────────────────────────────
 COPY scripts/entrypoint.sh    /entrypoint.sh
 COPY scripts/start-chrome.sh  /usr/local/bin/start-chrome.sh
+COPY scripts/start-x11vnc.sh  /usr/local/bin/start-x11vnc.sh
 COPY scripts/on-startup.sh    /etc/skel/on-startup.sh
 
-RUN chmod +x /entrypoint.sh /usr/local/bin/start-chrome.sh /etc/skel/on-startup.sh
+RUN chmod +x /entrypoint.sh /usr/local/bin/start-chrome.sh /usr/local/bin/start-x11vnc.sh /etc/skel/on-startup.sh
 
 # ── Copy agent-browser skill ──────────────────────────────────────────────────
 COPY skills/agent-browser/SKILL.md /etc/skel/.claude/skills/agent-browser/SKILL.md

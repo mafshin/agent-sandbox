@@ -43,6 +43,21 @@ echo "[sandbox] Running ${STARTUP_SCRIPT} ..."
 gosu agent bash "${STARTUP_SCRIPT}" 2>&1 | tee /tmp/on-startup.log || true
 echo "[sandbox] on-startup.sh complete."
 
+# ── Print access URLs ─────────────────────────────────────────────────────────
+PORT="${PORT:-8080}"
+cat <<EOF
+
+══════════════════════════════════════════════════
+  agent-sandbox
+══════════════════════════════════════════════════
+  Dashboard  →  http://localhost:${PORT}
+  VSCode     →  http://localhost:${PORT}/code/
+  Browser    →  http://localhost:${PORT}/vnc/vnc.html?autoconnect=true
+  Terminal   →  http://localhost:${PORT}/terminal/
+══════════════════════════════════════════════════
+  Services are starting — logs follow:
+
+EOF
+
 # ── Hand off to supervisord ───────────────────────────────────────────────────
-echo "[sandbox] Starting services..."
 exec /usr/bin/supervisord -c /etc/supervisor/conf.d/sandbox.conf

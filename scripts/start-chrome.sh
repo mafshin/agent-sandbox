@@ -4,7 +4,7 @@ until xdpyinfo -display :99 >/dev/null 2>&1; do
     sleep 0.5
 done
 
-exec chromium-browser \
+exec chromium \
     --no-sandbox \
     --disable-dev-shm-usage \
     --disable-gpu \
