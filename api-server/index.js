@@ -77,6 +77,7 @@ function connectCDP(attempt = 1) {
         setTimeout(() => connectCDP(attempt + 1), RETRY_INTERVAL_MS);
       } else {
         console.error('[api-server] Failed to connect to CDP after 30 attempts — exiting');
+        _reconnecting = false;
         process.exit(1);
       }
     },

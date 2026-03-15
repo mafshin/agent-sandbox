@@ -409,6 +409,9 @@ router.get('/title', async (req, res) => {
  *               pixels:
  *                 type: integer
  *                 description: Number of pixels to scroll
+ *               selector:
+ *                 type: string
+ *                 description: CSS selector of element to scroll (optional)
  *     responses:
  *       200:
  *         description: Scrolled
@@ -416,13 +419,14 @@ router.get('/title', async (req, res) => {
  *         description: Missing or invalid direction
  */
 router.post('/scroll', async (req, res) => {
-  const { direction, pixels } = req.body ?? {};
+  const { direction, pixels, selector } = req.body ?? {};
   const validDirections = ['up', 'down', 'left', 'right'];
   if (!direction || !validDirections.includes(direction)) {
     return res.status(400).json({ success: false, error: 'direction must be one of: up, down, left, right' });
   }
   const args = ['scroll', direction];
   if (typeof pixels === 'number') args.push(String(pixels));
+  if (selector) args.push(selector);
   try {
     const result = await runAgentBrowser(args);
     res.json({ success: true, result });
