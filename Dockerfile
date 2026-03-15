@@ -114,6 +114,14 @@ COPY config/nginx.conf        /etc/nginx/nginx.conf
 COPY config/supervisord.conf  /etc/supervisor/conf.d/sandbox.conf
 COPY config/code-server.yaml  /home/agent/.config/code-server/config.yaml
 
+# ── api-server ────────────────────────────────────────────────────────────────
+COPY api-server/package.json      /opt/api-server/package.json
+COPY api-server/package-lock.json /opt/api-server/package-lock.json
+RUN npm ci --prefix /opt/api-server --omit=dev
+COPY api-server/state.js          /opt/api-server/state.js
+COPY api-server/index.js          /opt/api-server/index.js
+COPY api-server/routes/           /opt/api-server/routes/
+
 # ── Copy scripts ──────────────────────────────────────────────────────────────
 COPY scripts/entrypoint.sh    /entrypoint.sh
 COPY scripts/start-chrome.sh  /usr/local/bin/start-chrome.sh
