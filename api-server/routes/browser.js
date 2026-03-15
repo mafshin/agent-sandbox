@@ -4,7 +4,8 @@ const { Router } = require('express');
 const { execFile } = require('child_process');
 const { tmpdir } = require('os');
 const { join } = require('path');
-const { readFileSync, unlinkSync } = require('fs');
+const { promises: fsPromises } = require('fs');
+const { randomUUID } = require('crypto');
 const { isBrowserReady } = require('../state');
 
 const router = Router();
@@ -31,7 +32,10 @@ function runAgentBrowser(args, opts = {}) {
       },
       (err, stdout, stderr) => {
         if (err) {
-          reject(new Error((stderr || stdout || err.message).trim()));
+          const msg = err.killed
+            ? `agent-browser command timed out after ${opts.timeout ?? 30_000}ms`
+            : (stderr || stdout || err.message).trim();
+          reject(new Error(msg));
           return;
         }
         const raw = stdout.trim();
@@ -76,6 +80,14 @@ router.post('/open', async (req, res) => {
   const { url } = req.body ?? {};
   if (!url) return res.status(400).json({ success: false, error: 'url is required' });
   try {
+    const parsed = new URL(url);
+    if (!['http:', 'https:'].includes(parsed.protocol)) {
+      return res.status(400).json({ success: false, error: 'url must use http or https protocol' });
+    }
+  } catch {
+    return res.status(400).json({ success: false, error: 'url is not a valid URL' });
+  }
+  try {
     const result = await runAgentBrowser(['open', url]);
     res.json({ success: true, result });
   } catch (err) {
@@ -112,14 +124,14 @@ router.post('/open', async (req, res) => {
  *                       example: image/png
  */
 router.get('/screenshot', async (req, res) => {
-  const tmpPath = join(tmpdir(), `sb-screenshot-${Date.now()}.png`);
+  const tmpPath = join(tmpdir(), `sb-screenshot-${randomUUID()}.png`);
   try {
     await runAgentBrowser(['screenshot', tmpPath]);
-    const data = readFileSync(tmpPath).toString('base64');
-    try { unlinkSync(tmpPath); } catch { /* ignore */ }
+    const data = (await fsPromises.readFile(tmpPath)).toString('base64');
+    try { await fsPromises.unlink(tmpPath); } catch { /* ignore */ }
     res.json({ success: true, result: { data, mimeType: 'image/png' } });
   } catch (err) {
-    try { unlinkSync(tmpPath); } catch { /* ignore */ }
+    try { await fsPromises.unlink(tmpPath); } catch { /* ignore */ }
     res.status(500).json({ success: false, error: err.message });
   }
 });
@@ -155,7 +167,12 @@ router.post('/snapshot', async (req, res) => {
   const args = ['snapshot'];
   if (interactive) args.push('-i');
   if (compact) args.push('-c');
-  if (typeof depth === 'number') args.push('-d', String(depth));
+  if (depth !== undefined && depth !== null) {
+    if (!Number.isInteger(depth) || depth < 1) {
+      return res.status(400).json({ success: false, error: 'depth must be a positive integer' });
+    }
+    args.push('-d', String(depth));
+  }
   try {
     const result = await runAgentBrowser(args);
     res.json({ success: true, result });
@@ -425,7 +442,12 @@ router.post('/scroll', async (req, res) => {
     return res.status(400).json({ success: false, error: 'direction must be one of: up, down, left, right' });
   }
   const args = ['scroll', direction];
-  if (typeof pixels === 'number') args.push(String(pixels));
+  if (pixels !== undefined && pixels !== null) {
+    if (!Number.isInteger(pixels) || pixels < 1) {
+      return res.status(400).json({ success: false, error: 'pixels must be a positive integer' });
+    }
+    args.push(String(pixels));
+  }
   if (selector) args.push(selector);
   try {
     const result = await runAgentBrowser(args);
@@ -499,6 +521,9 @@ router.post('/wait', async (req, res) => {
   } else if (type === 'timeout') {
     if (typeof ms !== 'number' || ms <= 0) {
       return res.status(400).json({ success: false, error: 'ms must be a positive number for type "timeout"' });
+    }
+    if (ms > 60_000) {
+      return res.status(400).json({ success: false, error: 'ms must not exceed 60000 for type "timeout"' });
     }
     args = ['wait', String(ms)];
     // Give agent-browser at least ms + 5s to resolve before we kill the subprocess

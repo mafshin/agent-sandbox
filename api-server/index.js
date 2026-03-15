@@ -74,9 +74,9 @@ function connectCDP(attempt = 1) {
         _reconnecting = false;
       } else if (attempt < MAX_ATTEMPTS) {
         console.log(`[api-server] CDP connect attempt ${attempt}/${MAX_ATTEMPTS} failed, retrying…`);
-        setTimeout(() => connectCDP(attempt + 1), RETRY_INTERVAL_MS);
+        setTimeout(() => connectCDP(attempt + 1), RETRY_INTERVAL_MS).unref();
       } else {
-        console.error('[api-server] Failed to connect to CDP after 30 attempts — exiting');
+        console.error(`[api-server] Failed to connect to CDP after ${MAX_ATTEMPTS} attempts — exiting`);
         _reconnecting = false;
         process.exit(1);
       }
@@ -105,8 +105,13 @@ function startWatchdog() {
 }
 
 // ── Start ──────────────────────────────────────────────────────────────────
-app.listen(PORT, '127.0.0.1', () => {
+const server = app.listen(PORT, '127.0.0.1', () => {
   console.log(`[api-server] Listening on http://127.0.0.1:${PORT}${BASE}`);
   connectCDP();
   startWatchdog();
+});
+
+server.on('error', (err) => {
+  console.error('[api-server] Server error:', err.message);
+  process.exit(1);
 });
