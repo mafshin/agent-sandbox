@@ -34,6 +34,13 @@ if [ ! -f "${STARTUP_SCRIPT}" ]; then
     chown agent:agent "${STARTUP_SCRIPT}"
 fi
 
+# ── Seed CONNECT-VSCODE.md on first run ───────────────────────────────────────
+CONNECT_DOC="${WORKSPACE}/CONNECT-VSCODE.md"
+if [ ! -f "${CONNECT_DOC}" ]; then
+    cp /etc/skel/CONNECT-VSCODE.md "${CONNECT_DOC}"
+    chown agent:agent "${CONNECT_DOC}"
+fi
+
 # ── Ensure log dirs exist ─────────────────────────────────────────────────────
 mkdir -p /var/log/supervisor /var/log/nginx
 chown -R agent:agent /var/log/supervisor
@@ -45,24 +52,24 @@ echo "[sandbox] on-startup.sh complete."
 
 # ── Print access URLs ─────────────────────────────────────────────────────────
 PORT="${PORT:-8080}"
-cat <<'BANNER'
-
-                          _                         _ _
-  __ _  __ _  ___ _ __ | |_      ___  __ _ _ __   __| | |__   _____  __
- / _` |/ _` |/ _ \ '_ \| __|    / __|/ _` | '_ \ / _` | '_ \ / _ \ \/ /
-| (_| | (_| |  __/ | | | |_     \__ \ (_| | | | | (_| | |_) | (_) >  <
- \__,_|\__, |\___|_| |_|\__|    |___/\__,_|_| |_|\__,_|_.__/ \___/_/\_\
-        |___/
-
-BANNER
-echo "  Dashboard  →  http://localhost:${PORT}"
-echo "  VSCode     →  http://localhost:${PORT}/editor/"
-echo "  Browser    →  http://localhost:${PORT}/vnc/vnc.html?autoconnect=true"
-echo "  Terminal   →  http://localhost:${PORT}/terminal/"
-echo "  API        →  http://localhost:${PORT}/sandbox-api/docs"
-echo ""
-echo "  Services are starting — logs follow:"
-echo ""
+CYAN='\033[36m'; YELLOW='\033[33m'; GREEN='\033[32m'; BOLD='\033[1m'; RESET='\033[0m'
+printf "${CYAN}${BOLD}"
+printf "\n"
+printf "                          _                         _ _\n"
+printf "  __ _  __ _  ___ _ __ | |_      ___  __ _ _ __   __| | |__   _____  __\n"
+printf " / _\` |/ _\` |/ _ \\ '_ \\| __|    / __|/ _\` | '_ \\ / _\` | '_ \\ / _ \\ \\/ /\n"
+printf "| (_| | (_| |  __/ | | | |_     \\__ \\ (_| | | | | (_| | |_) | (_) >  <\n"
+printf " \\__,_|\\__, |\\___|_| |_|\\__|    |___/\\__,_|_| |_|\\__,_|_.__/ \\___/_/\\_\\\n"
+printf "        |___/\n"
+printf "${RESET}\n"
+printf "  ${YELLOW}Dashboard${RESET}  →  ${GREEN}http://localhost:${PORT}${RESET}\n"
+printf "  ${YELLOW}VSCode${RESET}     →  ${GREEN}http://localhost:${PORT}/editor/${RESET}\n"
+printf "  ${YELLOW}Browser${RESET}    →  ${GREEN}http://localhost:${PORT}/vnc/vnc.html?autoconnect=true${RESET}\n"
+printf "  ${YELLOW}Terminal${RESET}   →  ${GREEN}http://localhost:${PORT}/terminal/${RESET}\n"
+printf "  ${YELLOW}API${RESET}        →  ${GREEN}http://localhost:${PORT}/sandbox-api/docs${RESET}\n"
+printf "\n"
+printf "  Services are starting — logs follow:\n"
+printf "\n"
 
 # ── Hand off to supervisord ───────────────────────────────────────────────────
 exec /usr/bin/supervisord -c /etc/supervisor/conf.d/sandbox.conf

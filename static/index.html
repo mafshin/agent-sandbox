@@ -3,12 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>agent-sandbox</title>
+  <title>Agent Sandbox</title>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
       display: flex;
+      flex-direction: column;
       height: 100vh;
       background: #1e1e1e;
       font-family: 'Segoe UI', system-ui, monospace;
@@ -16,7 +17,52 @@
       user-select: none;
     }
 
-    /* ── Left pane (Editor) ──────────────────────────────────────────────── */
+    /* ── App header ──────────────────────────────────────────────────────────── */
+    #app-header {
+      height: 36px;
+      background: #0d1117;
+      border-bottom: 1px solid #007acc;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 16px;
+      flex-shrink: 0;
+    }
+    #app-header .app-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: #58a6ff;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+    #app-header .app-title span {
+      color: #79c0ff;
+      font-weight: 400;
+    }
+    #app-header nav {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+    }
+    #app-header nav a {
+      color: #8b949e;
+      text-decoration: none;
+      font-size: 11px;
+      padding: 3px 9px;
+      border: 1px solid #30363d;
+      border-radius: 4px;
+      transition: color 0.1s, border-color 0.1s, background 0.1s;
+    }
+    #app-header nav a:hover { color: #e6edf3; border-color: #007acc; background: #161b22; }
+
+    /* ── Main content area ───────────────────────────────────────────────────── */
+    #main {
+      flex: 1;
+      display: flex;
+      overflow: hidden;
+    }
+
+    /* ── Left pane (Editor) ──────────────────────────────────────────────────── */
     #pane-left {
       display: flex;
       flex-direction: column;
@@ -24,7 +70,7 @@
       min-width: 200px;
     }
 
-    /* ── Horizontal drag handle ──────────────────────────────────────────── */
+    /* ── Horizontal drag handle ──────────────────────────────────────────────── */
     #divider-h {
       width: 5px;
       background: #2d2d2d;
@@ -34,7 +80,7 @@
     }
     #divider-h:hover, #divider-h.dragging { background: #007acc; }
 
-    /* ── Right column ────────────────────────────────────────────────────── */
+    /* ── Right column ────────────────────────────────────────────────────────── */
     #col-right {
       flex: 1;
       display: flex;
@@ -43,7 +89,7 @@
       overflow: hidden;
     }
 
-    /* ── Top-right pane (Browser) ────────────────────────────────────────── */
+    /* ── Top-right pane (Browser) ────────────────────────────────────────────── */
     #pane-top {
       display: flex;
       flex-direction: column;
@@ -51,7 +97,7 @@
       min-height: 100px;
     }
 
-    /* ── Vertical drag handle ────────────────────────────────────────────── */
+    /* ── Vertical drag handle ────────────────────────────────────────────────── */
     #divider-v {
       height: 5px;
       background: #2d2d2d;
@@ -61,7 +107,7 @@
     }
     #divider-v:hover, #divider-v.dragging { background: #007acc; }
 
-    /* ── Bottom-right pane (Terminal) ────────────────────────────────────── */
+    /* ── Bottom-right pane (Terminal) ────────────────────────────────────────── */
     #pane-bottom {
       flex: 1;
       display: flex;
@@ -69,7 +115,7 @@
       min-height: 100px;
     }
 
-    /* ── Pane header bar ─────────────────────────────────────────────────── */
+    /* ── Pane header bar ─────────────────────────────────────────────────────── */
     .pane-header {
       display: flex;
       align-items: center;
@@ -104,65 +150,93 @@
       width: 100%;
       background: #1e1e1e;
     }
+
+    /* Applied during drag to block iframe mouse capture */
+    body.dragging iframe { pointer-events: none; }
   </style>
 </head>
 <body>
 
-  <!-- ── Left: Editor ──────────────────────────────────────────────────── -->
-  <div id="pane-left">
-    <div class="pane-header">
-      <span class="title">Editor</span>
-      <a class="open-btn" href="/editor/" target="_blank">&#x2197; new window</a>
-    </div>
-    <iframe src="/editor/" title="VSCode Editor" allow="clipboard-read; clipboard-write"></iframe>
-  </div>
+  <!-- ── App header ────────────────────────────────────────────────────────── -->
+  <header id="app-header">
+    <div class="app-title">Agent <span>Sandbox</span></div>
+    <nav>
+      <a href="/sandbox-api/docs" target="_blank">API Docs</a>
+      <a href="/editor/" target="_blank">Editor</a>
+      <a href="/vnc/vnc.html?autoconnect=true&resize=scale" target="_blank">Browser</a>
+      <a href="/terminal/" target="_blank">Terminal</a>
+    </nav>
+  </header>
 
-  <div id="divider-h"></div>
+  <!-- ── Main workspace ───────────────────────────────────────────────────── -->
+  <div id="main">
 
-  <!-- ── Right column ──────────────────────────────────────────────────── -->
-  <div id="col-right">
-
-    <!-- ── Top-right: Browser ──────────────────────────────────────────── -->
-    <div id="pane-top">
+    <!-- ── Left: Editor ──────────────────────────────────────────────────── -->
+    <div id="pane-left">
       <div class="pane-header">
-        <span class="title">Browser</span>
-        <a class="open-btn" href="/vnc/vnc.html?autoconnect=true" target="_blank">&#x2197; new window</a>
+        <span class="title">Editor</span>
+        <a class="open-btn" href="/editor/" target="_blank">&#x2197; new window</a>
       </div>
-      <iframe src="/vnc/vnc.html?autoconnect=true" title="Browser (VNC)"></iframe>
+      <iframe src="/editor/" title="VSCode Editor" allow="clipboard-read; clipboard-write"></iframe>
     </div>
 
-    <div id="divider-v"></div>
+    <div id="divider-h"></div>
 
-    <!-- ── Bottom-right: Terminal ──────────────────────────────────────── -->
-    <div id="pane-bottom">
-      <div class="pane-header">
-        <span class="title">Terminal</span>
-        <a class="open-btn" href="/terminal/" target="_blank">&#x2197; new window</a>
+    <!-- ── Right column ──────────────────────────────────────────────────── -->
+    <div id="col-right">
+
+      <!-- ── Top-right: Browser ────────────────────────────────────────── -->
+      <div id="pane-top">
+        <div class="pane-header">
+          <span class="title">Browser</span>
+          <a class="open-btn" href="/vnc/vnc.html?autoconnect=true&resize=scale" target="_blank">&#x2197; new window</a>
+        </div>
+        <iframe src="/vnc/vnc.html?autoconnect=true&resize=scale" title="Browser (VNC)"></iframe>
       </div>
-      <iframe src="/terminal/" title="Terminal"></iframe>
+
+      <div id="divider-v"></div>
+
+      <!-- ── Bottom-right: Terminal ────────────────────────────────────── -->
+      <div id="pane-bottom">
+        <div class="pane-header">
+          <span class="title">Terminal</span>
+          <a class="open-btn" href="/terminal/" target="_blank">&#x2197; new window</a>
+        </div>
+        <iframe src="/terminal/" title="Terminal"></iframe>
+      </div>
+
     </div>
 
   </div>
 
   <script>
-    // ── Horizontal splitter (left / right) ──────────────────────────────
+    // ── Drag helpers ─────────────────────────────────────────────────────────
+    // Setting pointer-events:none on iframes via a body class prevents iframes
+    // from swallowing mousemove/mouseup events during resize drags.
+
+    function startDrag() { document.body.classList.add('dragging'); }
+    function endDrag()   { document.body.classList.remove('dragging'); }
+
+    // ── Horizontal splitter (left / right) ───────────────────────────────────
     (function () {
       const handle = document.getElementById('divider-h');
       const left   = document.getElementById('pane-left');
 
       handle.addEventListener('mousedown', function (e) {
         e.preventDefault();
+        startDrag();
         handle.classList.add('dragging');
 
         const startX = e.clientX;
         const startW = left.getBoundingClientRect().width;
-        const totalW = document.body.getBoundingClientRect().width;
+        const totalW = document.getElementById('main').getBoundingClientRect().width;
 
         function onMove(e) {
           const w = Math.max(200, Math.min(totalW - 200, startW + e.clientX - startX));
           left.style.flex = '0 0 ' + w + 'px';
         }
         function onUp() {
+          endDrag();
           handle.classList.remove('dragging');
           document.removeEventListener('mousemove', onMove);
           document.removeEventListener('mouseup', onUp);
@@ -172,13 +246,14 @@
       });
     })();
 
-    // ── Vertical splitter (top-right / bottom-right) ─────────────────────
+    // ── Vertical splitter (top-right / bottom-right) ─────────────────────────
     (function () {
       const handle  = document.getElementById('divider-v');
       const paneTop = document.getElementById('pane-top');
 
       handle.addEventListener('mousedown', function (e) {
         e.preventDefault();
+        startDrag();
         handle.classList.add('dragging');
 
         const startY = e.clientY;
@@ -191,6 +266,7 @@
           paneTop.style.flex = '0 0 ' + h + 'px';
         }
         function onUp() {
+          endDrag();
           handle.classList.remove('dragging');
           document.removeEventListener('mousemove', onMove);
           document.removeEventListener('mouseup', onUp);
