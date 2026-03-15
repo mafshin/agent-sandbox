@@ -22,11 +22,15 @@ Built as a transparent, auditable alternative to proprietary sandbox images.
 ## Quick start
 
 ```bash
-# Pull and run
-docker compose up
+# Pull and run (shows live logs)
+docker run --name agent-sandbox --shm-size=2gb --security-opt seccomp:unconfined -p 8080:8080 -v agent-workspace:/workspace ghcr.io/mafshin/agent-sandbox:latest
 
-# Or run directly
+# Run in background
 docker run -d --name agent-sandbox --shm-size=2gb --security-opt seccomp:unconfined -p 8080:8080 -v agent-workspace:/workspace ghcr.io/mafshin/agent-sandbox:latest
+docker logs -f agent-sandbox   # then follow logs separately
+
+# Or with docker compose
+docker compose up
 ```
 
 Open **http://localhost:8080** for the dashboard (VSCode + browser + terminal in one view).

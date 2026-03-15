@@ -45,19 +45,23 @@ echo "[sandbox] on-startup.sh complete."
 
 # ── Print access URLs ─────────────────────────────────────────────────────────
 PORT="${PORT:-8080}"
-cat <<EOF
+cat <<'BANNER'
 
-══════════════════════════════════════════════════
-  agent-sandbox
-══════════════════════════════════════════════════
-  Dashboard  →  http://localhost:${PORT}
-  VSCode     →  http://localhost:${PORT}/code/
-  Browser    →  http://localhost:${PORT}/vnc/vnc.html?autoconnect=true
-  Terminal   →  http://localhost:${PORT}/terminal/
-══════════════════════════════════════════════════
-  Services are starting — logs follow:
+                          _                         _ _
+  __ _  __ _  ___ _ __ | |_      ___  __ _ _ __   __| | |__   _____  __
+ / _` |/ _` |/ _ \ '_ \| __|    / __|/ _` | '_ \ / _` | '_ \ / _ \ \/ /
+| (_| | (_| |  __/ | | | |_     \__ \ (_| | | | | (_| | |_) | (_) >  <
+ \__,_|\__, |\___|_| |_|\__|    |___/\__,_|_| |_|\__,_|_.__/ \___/_/\_\
+        |___/
 
-EOF
+BANNER
+echo "  Dashboard  →  http://localhost:${PORT}"
+echo "  VSCode     →  http://localhost:${PORT}/code/"
+echo "  Browser    →  http://localhost:${PORT}/vnc/vnc.html?autoconnect=true"
+echo "  Terminal   →  http://localhost:${PORT}/terminal/"
+echo ""
+echo "  Services are starting — logs follow:"
+echo ""
 
 # ── Hand off to supervisord ───────────────────────────────────────────────────
 exec /usr/bin/supervisord -c /etc/supervisor/conf.d/sandbox.conf
