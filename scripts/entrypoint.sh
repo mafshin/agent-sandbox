@@ -47,14 +47,17 @@ echo "[sandbox] on-startup.sh complete."
 PORT="${PORT:-8080}"
 CYAN='\033[36m'; YELLOW='\033[33m'; GREEN='\033[32m'; BOLD='\033[1m'; RESET='\033[0m'
 printf "${CYAN}${BOLD}"
-printf "\n"
-printf "                          _                         _ _\n"
-printf "  __ _  __ _  ___ _ __ | |_      ___  __ _ _ __   __| | |__   _____  __\n"
-printf " / _\` |/ _\` |/ _ \\ '_ \\| __|    / __|/ _\` | '_ \\ / _\` | '_ \\ / _ \\ \\/ /\n"
-printf "| (_| | (_| |  __/ | | | |_     \\__ \\ (_| | | | | (_| | |_) | (_) >  <\n"
-printf " \\__,_|\\__, |\\___|_| |_|\\__|    |___/\\__,_|_| |_|\\__,_|_.__/ \\___/_/\\_\\\n"
-printf "        |___/\n"
-printf "${RESET}\n"
+cat << 'BANNER'
+
+                          _                         _ _
+  __ _  __ _  ___ _ __ | |_      ___  __ _ _ __   __| | |__   _____  __
+ / _` |/ _` |/ _ \ '_ \| __|    / __|/ _` | '_ \ / _` | '_ \ / _ \ \/ /
+| (_| | (_| |  __/ | | | |_     \__ \ (_| | | | | (_| | |_) | (_) >  <
+ \__,_|\__, |\___|_| |_|\__|    |___/\__,_|_| |_|\__,_|_.__/ \___/_/\_\
+        |___/
+
+BANNER
+printf "${RESET}"
 printf "  ${YELLOW}Dashboard${RESET}  →  ${GREEN}http://localhost:${PORT}${RESET}\n"
 printf "  ${YELLOW}VSCode${RESET}     →  ${GREEN}http://localhost:${PORT}/editor/${RESET}\n"
 printf "  ${YELLOW}Browser${RESET}    →  ${GREEN}http://localhost:${PORT}/vnc/vnc.html?autoconnect=true${RESET}\n"
