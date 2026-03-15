@@ -56,7 +56,7 @@ cat <<'BANNER'
 
 BANNER
 echo "  Dashboard  →  http://localhost:${PORT}"
-echo "  VSCode     →  http://localhost:${PORT}/code/"
+echo "  VSCode     →  http://localhost:${PORT}/editor/"
 echo "  Browser    →  http://localhost:${PORT}/vnc/vnc.html?autoconnect=true"
 echo "  Terminal   →  http://localhost:${PORT}/terminal/"
 echo ""

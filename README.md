@@ -9,7 +9,7 @@ Built as a transparent, auditable alternative to proprietary sandbox images.
 | Surface | Technology | URL |
 |---------|-----------|-----|
 | Dashboard (all panes) | custom HTML | `http://localhost:8080/` |
-| VSCode (editor + terminal) | [code-server](https://github.com/coder/code-server) | `http://localhost:8080/code/` |
+| VSCode (editor + terminal) | [code-server](https://github.com/coder/code-server) | `http://localhost:8080/editor/` |
 | Browser (interactive via VNC) | Chromium + [noVNC](https://github.com/novnc/noVNC) | `http://localhost:8080/vnc/vnc.html?autoconnect=true` |
 | Terminal | [ttyd](https://github.com/tsl0922/ttyd) | `http://localhost:8080/terminal/` |
 | Chrome DevTools Protocol | Chromium CDP | `localhost:9222` (container-internal) |
@@ -34,7 +34,7 @@ docker compose up
 ```
 
 Open **http://localhost:8080** for the dashboard (VSCode + browser + terminal in one view).
-Or open panes individually: `/code/` · `/vnc/vnc.html?autoconnect=true` · `/terminal/`
+Or open panes individually: `/editor/` · `/vnc/vnc.html?autoconnect=true` · `/terminal/`
 
 ## Customising the sandbox
 

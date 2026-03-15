@@ -8,7 +8,6 @@ exec chromium \
     --no-sandbox \
     --disable-dev-shm-usage \
     --disable-gpu \
-    --ozone-platform=x11 \
     --remote-debugging-port=9222 \
     --user-data-dir=/home/agent/.config/chromium \
     --profile-directory=agent \
