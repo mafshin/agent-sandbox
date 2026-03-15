@@ -82,7 +82,13 @@ Gives you native VS Code with your own extensions, themes, and keybindings, dire
    Dev Containers: Attach to Running Container...
    ```
 4. Select **agent-sandbox** from the list.
-5. In the new window, use `File → Open Folder` and navigate to `/workspace`.
+5. `/workspace` opens automatically.
+
+> **Note:** Auto-open requires the container to be running from the current image. If you see "No Folder Opened", the container was created from an older image — remove it and create a fresh one:
+> ```bash
+> docker rm -f agent-sandbox
+> docker run -d --name agent-sandbox --shm-size=2gb --security-opt seccomp:unconfined -p 8080:8080 -v agent-workspace:/workspace ghcr.io/mafshin/agent-sandbox:latest
+> ```
 
 Extensions installed inside the container persist only if you mount a volume for them.
 
