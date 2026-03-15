@@ -74,8 +74,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # ── Node.js 22 (official tarball — no apt, works on amd64 + arm64) ───────────
 ARG NODE_VERSION=22.14.0
 RUN ARCH=$(uname -m | sed 's/x86_64/x64/;s/aarch64/arm64/') && \
-    curl -fsSL "https://nodejs.org/dist/v${NODE_VERSION}/node-v${NODE_VERSION}-linux-${ARCH}.tar.xz" \
-    | tar -xJ -C /usr/local --strip-components=1 \
+    curl -fsSL "https://nodejs.org/dist/v${NODE_VERSION}/node-v${NODE_VERSION}-linux-${ARCH}.tar.gz" \
+    | tar -xz -C /usr/local --strip-components=1 \
     --exclude="*/CHANGELOG.md" --exclude="*/LICENSE" --exclude="*/README.md"
 
 # ── agent-browser CLI ─────────────────────────────────────────────────────────
