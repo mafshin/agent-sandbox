@@ -56,6 +56,33 @@ To run it without restarting:
 bash /workspace/on-startup.sh
 ```
 
+## Connecting a local VS Code to the sandbox
+
+The sandbox runs **code-server** (browser-hosted VS Code). You can also connect your local VS Code installation directly to the container.
+
+### Option A — Browser (no setup needed)
+
+Open `http://localhost:8080/editor/` in your browser. Full VS Code experience, no installation required.
+
+### Option B — Dev Containers (recommended for local VS Code)
+
+Gives you native VS Code with your own extensions, themes, and keybindings, directly editing `/workspace` inside the container.
+
+1. Install the [Dev Containers](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers) extension in your local VS Code.
+2. Start the sandbox container (if not already running).
+3. Open the Command Palette (`Ctrl+Shift+P` / `Cmd+Shift+P`) and run:
+   ```
+   Dev Containers: Attach to Running Container...
+   ```
+4. Select **agent-sandbox** from the list.
+5. In the new window, use `File → Open Folder` and navigate to `/workspace`.
+
+Extensions installed inside the container persist only if you mount a volume for them.
+
+### Option C — Remote SSH (advanced)
+
+The container does not include an SSH server by default. To use Remote SSH, add `openssh-server` to the Dockerfile, expose port 22, and configure SSH keys for the `agent` user. Option B is simpler for most cases.
+
 ## Environment variables
 
 | Variable | Default | Description |

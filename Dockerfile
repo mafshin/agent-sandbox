@@ -118,9 +118,6 @@ COPY config/code-server.yaml  /home/agent/.config/code-server/config.yaml
 RUN mkdir -p /home/agent/.local/share/code-server/User
 COPY config/vscode-settings.json /home/agent/.local/share/code-server/User/settings.json
 
-# ── Documentation seeded to workspace skeleton ────────────────────────────────
-COPY config/connect-vscode.md /etc/skel/CONNECT-VSCODE.md
-
 # ── api-server ────────────────────────────────────────────────────────────────
 COPY api-server/package.json      /opt/api-server/package.json
 COPY api-server/package-lock.json /opt/api-server/package-lock.json
