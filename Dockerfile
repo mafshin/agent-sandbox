@@ -34,7 +34,7 @@ FROM debian:bookworm-slim
 LABEL org.opencontainers.image.title="agent-sandbox"
 LABEL org.opencontainers.image.description="Lightweight developer sandbox: VSCode + Chromium + agent-browser (Debian Bookworm)"
 LABEL org.opencontainers.image.source="https://github.com/mafshin/agent-sandbox"
-LABEL devcontainer.metadata='[{"remoteUser":"agent","workspaceFolder":"/workspace","postAttachCommand":"code /workspace"}]'
+LABEL devcontainer.metadata='[{"remoteUser":"agent","workspaceFolder":"/workspace","postAttachCommand":"bash -c \"for f in /home/agent/.vscode-server/bin/*/bin/remote-cli/code; do \\\"$f\\\" /workspace; break; done\""}]'
 
 ENV DEBIAN_FRONTEND=noninteractive
 ENV DISPLAY=:99
