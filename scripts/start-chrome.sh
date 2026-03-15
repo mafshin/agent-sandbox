@@ -13,6 +13,8 @@ exec chromium \
     --profile-directory=agent \
     --window-size="${DISPLAY_WIDTH:-1280},${DISPLAY_HEIGHT:-1024}" \
     --no-first-run \
+    --disable-session-crashed-bubble \
+    --hide-crash-restore-bubble \
     --disable-default-apps \
     --disable-extensions \
     --disable-background-networking \
