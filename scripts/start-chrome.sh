@@ -7,11 +7,11 @@ done
 exec chromium-browser \
     --no-sandbox \
     --disable-dev-shm-usage \
+    --disable-gpu \
+    --disable-software-rasterizer \
     --remote-debugging-port=9222 \
-    --remote-debugging-address=0.0.0.0 \
     --user-data-dir=/home/agent/.config/chromium \
     --profile-directory=agent \
-    --display=:99 \
     --window-size="${DISPLAY_WIDTH:-1280},${DISPLAY_HEIGHT:-1024}" \
     --no-first-run \
     --disable-default-apps \

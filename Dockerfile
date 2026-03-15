@@ -79,6 +79,12 @@ RUN curl -fsSL https://deb.nodesource.com/setup_22.x | bash - && \
 # ── agent-browser CLI ─────────────────────────────────────────────────────────
 RUN npm install -g agent-browser@latest
 
+# ── ttyd (web terminal) ───────────────────────────────────────────────────────
+RUN ARCH=$(uname -m) && \
+    TTYD_ARCH=$([ "$ARCH" = "aarch64" ] && echo "aarch64" || echo "x86_64") && \
+    curl -fsSL "https://github.com/tsl0922/ttyd/releases/download/1.7.7/ttyd.${TTYD_ARCH}" \
+    -o /usr/local/bin/ttyd && chmod +x /usr/local/bin/ttyd
+
 # ── code-server ───────────────────────────────────────────────────────────────
 COPY --from=builder /tmp/code-server.deb /tmp/code-server.deb
 RUN dpkg -i /tmp/code-server.deb && rm /tmp/code-server.deb
@@ -115,6 +121,9 @@ RUN chmod +x /entrypoint.sh /usr/local/bin/start-chrome.sh /etc/skel/on-startup.
 
 # ── Copy agent-browser skill ──────────────────────────────────────────────────
 COPY skills/agent-browser/SKILL.md /etc/skel/.claude/skills/agent-browser/SKILL.md
+
+# ── Dashboard static files ────────────────────────────────────────────────────
+COPY static/ /opt/sandbox/
 
 # ── Fix ownership ─────────────────────────────────────────────────────────────
 RUN chown -R agent:agent /home/agent

@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>agent-sandbox</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      display: flex;
+      height: 100vh;
+      background: #1e1e1e;
+      font-family: 'Segoe UI', system-ui, monospace;
+      overflow: hidden;
+      user-select: none;
+    }
+
+    /* ── Left pane (Editor) ──────────────────────────────────────────────── */
+    #pane-left {
+      display: flex;
+      flex-direction: column;
+      flex: 0 0 60%;
+      min-width: 200px;
+    }
+
+    /* ── Horizontal drag handle ──────────────────────────────────────────── */
+    #divider-h {
+      width: 5px;
+      background: #2d2d2d;
+      cursor: col-resize;
+      flex-shrink: 0;
+      transition: background 0.15s;
+    }
+    #divider-h:hover, #divider-h.dragging { background: #007acc; }
+
+    /* ── Right column ────────────────────────────────────────────────────── */
+    #col-right {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-width: 200px;
+      overflow: hidden;
+    }
+
+    /* ── Top-right pane (Browser) ────────────────────────────────────────── */
+    #pane-top {
+      display: flex;
+      flex-direction: column;
+      flex: 0 0 60%;
+      min-height: 100px;
+    }
+
+    /* ── Vertical drag handle ────────────────────────────────────────────── */
+    #divider-v {
+      height: 5px;
+      background: #2d2d2d;
+      cursor: row-resize;
+      flex-shrink: 0;
+      transition: background 0.15s;
+    }
+    #divider-v:hover, #divider-v.dragging { background: #007acc; }
+
+    /* ── Bottom-right pane (Terminal) ────────────────────────────────────── */
+    #pane-bottom {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-height: 100px;
+    }
+
+    /* ── Pane header bar ─────────────────────────────────────────────────── */
+    .pane-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #252526;
+      color: #cccccc;
+      padding: 0 10px;
+      font-size: 12px;
+      border-bottom: 1px solid #3d3d3d;
+      flex-shrink: 0;
+      height: 28px;
+    }
+    .pane-header .title {
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      color: #9cdcfe;
+    }
+    .pane-header .open-btn {
+      color: #888;
+      text-decoration: none;
+      font-size: 11px;
+      padding: 2px 7px;
+      border: 1px solid #444;
+      border-radius: 3px;
+      transition: color 0.1s, border-color 0.1s;
+    }
+    .pane-header .open-btn:hover { color: #fff; border-color: #007acc; }
+
+    iframe {
+      flex: 1;
+      border: none;
+      width: 100%;
+      background: #1e1e1e;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ── Left: Editor ──────────────────────────────────────────────────── -->
+  <div id="pane-left">
+    <div class="pane-header">
+      <span class="title">Editor</span>
+      <a class="open-btn" href="/code/" target="_blank">&#x2197; new window</a>
+    </div>
+    <iframe src="/code/" title="VSCode Editor" allow="clipboard-read; clipboard-write"></iframe>
+  </div>
+
+  <div id="divider-h"></div>
+
+  <!-- ── Right column ──────────────────────────────────────────────────── -->
+  <div id="col-right">
+
+    <!-- ── Top-right: Browser ──────────────────────────────────────────── -->
+    <div id="pane-top">
+      <div class="pane-header">
+        <span class="title">Browser</span>
+        <a class="open-btn" href="/vnc/vnc.html?autoconnect=true" target="_blank">&#x2197; new window</a>
+      </div>
+      <iframe src="/vnc/vnc.html?autoconnect=true" title="Browser (VNC)"></iframe>
+    </div>
+
+    <div id="divider-v"></div>
+
+    <!-- ── Bottom-right: Terminal ──────────────────────────────────────── -->
+    <div id="pane-bottom">
+      <div class="pane-header">
+        <span class="title">Terminal</span>
+        <a class="open-btn" href="/terminal/" target="_blank">&#x2197; new window</a>
+      </div>
+      <iframe src="/terminal/" title="Terminal"></iframe>
+    </div>
+
+  </div>
+
+  <script>
+    // ── Horizontal splitter (left / right) ──────────────────────────────
+    (function () {
+      const handle = document.getElementById('divider-h');
+      const left   = document.getElementById('pane-left');
+
+      handle.addEventListener('mousedown', function (e) {
+        e.preventDefault();
+        handle.classList.add('dragging');
+
+        const startX = e.clientX;
+        const startW = left.getBoundingClientRect().width;
+        const totalW = document.body.getBoundingClientRect().width;
+
+        function onMove(e) {
+          const w = Math.max(200, Math.min(totalW - 200, startW + e.clientX - startX));
+          left.style.flex = '0 0 ' + w + 'px';
+        }
+        function onUp() {
+          handle.classList.remove('dragging');
+          document.removeEventListener('mousemove', onMove);
+          document.removeEventListener('mouseup', onUp);
+        }
+        document.addEventListener('mousemove', onMove);
+        document.addEventListener('mouseup', onUp);
+      });
+    })();
+
+    // ── Vertical splitter (top-right / bottom-right) ─────────────────────
+    (function () {
+      const handle  = document.getElementById('divider-v');
+      const paneTop = document.getElementById('pane-top');
+
+      handle.addEventListener('mousedown', function (e) {
+        e.preventDefault();
+        handle.classList.add('dragging');
+
+        const startY = e.clientY;
+        const startH = paneTop.getBoundingClientRect().height;
+        const colRight = document.getElementById('col-right');
+        const totalH = colRight.getBoundingClientRect().height;
+
+        function onMove(e) {
+          const h = Math.max(100, Math.min(totalH - 100, startH + e.clientY - startY));
+          paneTop.style.flex = '0 0 ' + h + 'px';
+        }
+        function onUp() {
+          handle.classList.remove('dragging');
+          document.removeEventListener('mousemove', onMove);
+          document.removeEventListener('mouseup', onUp);
+        }
+        document.addEventListener('mousemove', onMove);
+        document.addEventListener('mouseup', onUp);
+      });
+    })();
+  </script>
+</body>
+</html>

@@ -8,8 +8,10 @@ Built as a transparent, auditable alternative to proprietary sandbox images.
 
 | Surface | Technology | URL |
 |---------|-----------|-----|
-| VSCode (editor + terminal) | [code-server](https://github.com/coder/code-server) | `http://localhost:8080/` |
+| Dashboard (all panes) | custom HTML | `http://localhost:8080/` |
+| VSCode (editor + terminal) | [code-server](https://github.com/coder/code-server) | `http://localhost:8080/code/` |
 | Browser (interactive via VNC) | Chromium + [noVNC](https://github.com/novnc/noVNC) | `http://localhost:8080/vnc/vnc.html?autoconnect=true` |
+| Terminal | [ttyd](https://github.com/tsl0922/ttyd) | `http://localhost:8080/terminal/` |
 | Chrome DevTools Protocol | Chromium CDP | `localhost:9222` (container-internal) |
 
 - **`agent-browser` CLI** pre-installed — Claude can drive the browser immediately
@@ -27,8 +29,8 @@ docker compose up
 docker run -d --name agent-sandbox --shm-size=2gb --security-opt seccomp:unconfined -p 8080:8080 -v agent-workspace:/workspace ghcr.io/mafshin/agent-sandbox:latest
 ```
 
-Open **http://localhost:8080** for VSCode.
-Open **http://localhost:8080/vnc/vnc.html?autoconnect=true** for the browser view.
+Open **http://localhost:8080** for the dashboard (VSCode + browser + terminal in one view).
+Or open panes individually: `/code/` · `/vnc/vnc.html?autoconnect=true` · `/terminal/`
 
 ## Customising the sandbox
 
@@ -89,8 +91,11 @@ supervisord (PID 1)
 ├── Chromium      :9222   Browser (CDP) on Xvfb, profile: agent
 ├── x11vnc        :5900   VNC server — full keyboard + mouse input
 ├── websockify    :6080   WebSocket bridge for noVNC
+├── ttyd          :7681   Web terminal (bash)
 ├── code-server   :8443   VSCode
 └── nginx         :8080   Reverse proxy (single public port)
+                           / → dashboard, /code/ → VSCode,
+                           /vnc/ → noVNC, /terminal/ → ttyd
 ```
 
 ## License
@@ -106,6 +111,7 @@ The Docker image bundles the following open-source components. Each runs as a se
 | [code-server](https://github.com/coder/code-server) | MIT | github.com/coder/code-server |
 | [noVNC](https://github.com/novnc/noVNC) | MPL-2.0 | github.com/novnc/noVNC |
 | [websockify](https://github.com/novnc/websockify) | LGPL-3.0 | github.com/novnc/websockify |
+| [ttyd](https://github.com/tsl0922/ttyd) | MIT | github.com/tsl0922/ttyd |
 | [agent-browser](https://www.npmjs.com/package/agent-browser) | Apache-2.0 | npmjs.com/package/agent-browser |
 | nginx | BSD-2-Clause | nginx.org |
 | supervisor | BSD-derived | supervisord.org |
