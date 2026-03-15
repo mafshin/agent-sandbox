@@ -21,15 +21,22 @@ Built as a transparent, auditable alternative to proprietary sandbox images.
 
 ## Quick start
 
+Pull and run (shows live logs):
+
 ```bash
-# Pull and run (shows live logs)
 docker run --name agent-sandbox --shm-size=2gb --security-opt seccomp:unconfined -p 8080:8080 -v agent-workspace:/workspace ghcr.io/mafshin/agent-sandbox:latest
+```
 
-# Run in background
+Run in background, then follow logs separately:
+
+```bash
 docker run -d --name agent-sandbox --shm-size=2gb --security-opt seccomp:unconfined -p 8080:8080 -v agent-workspace:/workspace ghcr.io/mafshin/agent-sandbox:latest
-docker logs -f agent-sandbox   # then follow logs separately
+docker logs -f agent-sandbox
+```
 
-# Or with docker compose
+Or with docker compose:
+
+```bash
 docker compose up
 ```
 
