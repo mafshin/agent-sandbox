@@ -5,4 +5,4 @@ until xdpyinfo -display :99 >/dev/null 2>&1; do
 done
 sleep 2
 
-exec x11vnc -display :99 -nopw -forever -shared -port 5900
+exec x11vnc -display :99 -nopw -forever -shared -rfbport 5900
