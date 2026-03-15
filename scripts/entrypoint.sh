@@ -34,12 +34,10 @@ if [ ! -f "${STARTUP_SCRIPT}" ]; then
     chown agent:agent "${STARTUP_SCRIPT}"
 fi
 
-# ── Seed CONNECT-VSCODE.md on first run ───────────────────────────────────────
+# ── Seed CONNECT-VSCODE.md (always refresh so updates reach existing volumes) ──
 CONNECT_DOC="${WORKSPACE}/CONNECT-VSCODE.md"
-if [ ! -f "${CONNECT_DOC}" ]; then
-    cp /etc/skel/CONNECT-VSCODE.md "${CONNECT_DOC}"
-    chown agent:agent "${CONNECT_DOC}"
-fi
+cp /etc/skel/CONNECT-VSCODE.md "${CONNECT_DOC}"
+chown agent:agent "${CONNECT_DOC}"
 
 # ── Ensure log dirs exist ─────────────────────────────────────────────────────
 mkdir -p /var/log/supervisor /var/log/nginx
