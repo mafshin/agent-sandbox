@@ -4,6 +4,8 @@ A lightweight, fully open-source developer sandbox with VSCode, terminal, and a 
 
 Built as a transparent, auditable alternative to proprietary sandbox images.
 
+![Agent Sandbox dashboard showing the editor, browser, and terminal panes](docs/agent-sandbox.png)
+
 ## What's inside
 
 | Surface | Technology | URL |
