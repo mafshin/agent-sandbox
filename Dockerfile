@@ -136,9 +136,6 @@ COPY scripts/on-startup.sh    /etc/skel/on-startup.sh
 
 RUN chmod +x /entrypoint.sh /usr/local/bin/start-chrome.sh /usr/local/bin/start-x11vnc.sh /etc/skel/on-startup.sh
 
-# ── Copy agent-browser skill ──────────────────────────────────────────────────
-COPY skills/agent-browser/SKILL.md /etc/skel/.claude/skills/agent-browser/SKILL.md
-
 # ── Dashboard static files ────────────────────────────────────────────────────
 COPY static/ /opt/sandbox/
 
