@@ -17,10 +17,13 @@ fi
 mkdir -p "${WORKSPACE}"
 chown agent:agent "${WORKSPACE}"
 
-# ── Install agent-browser skill on first run ──────────────────────────────────
+# ── Seed agent-browser skill on first run ─────────────────────────────────────
+SKILL_SRC="/etc/skel/.claude/skills/agent-browser/SKILL.md"
 SKILL_DST="/home/agent/.claude/skills/agent-browser/SKILL.md"
 if [ ! -f "${SKILL_DST}" ]; then
-    gosu agent npx -y skills add vercel-labs/agent-browser --skill agent-browser
+    mkdir -p "$(dirname "${SKILL_DST}")"
+    cp "${SKILL_SRC}" "${SKILL_DST}"
+    chown -R agent:agent /home/agent/.claude
 fi
 
 # ── Seed on-startup.sh on first run ───────────────────────────────────────────
