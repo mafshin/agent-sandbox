@@ -18,16 +18,9 @@ mkdir -p "${WORKSPACE}"
 chown agent:agent "${WORKSPACE}"
 
 # ── Install agent-browser skill on first run ──────────────────────────────────
-SKILL_DIR="/home/agent/.claude/skills/agent-browser"
-if [ ! -d "${SKILL_DIR}" ]; then
-    TMP_REPO=$(mktemp -d)
-    git clone --depth 1 --filter=blob:none --sparse \
-        https://github.com/vercel-labs/agent-browser.git "${TMP_REPO}"
-    git -C "${TMP_REPO}" sparse-checkout set skills/agent-browser
-    mkdir -p "$(dirname "${SKILL_DIR}")"
-    cp -r "${TMP_REPO}/skills/agent-browser" "${SKILL_DIR}"
-    chown -R agent:agent /home/agent/.claude
-    rm -rf "${TMP_REPO}"
+SKILL_DST="/home/agent/.claude/skills/agent-browser/SKILL.md"
+if [ ! -f "${SKILL_DST}" ]; then
+    gosu agent npx -y skills add vercel-labs/agent-browser --skill agent-browser
 fi
 
 # ── Seed on-startup.sh on first run ───────────────────────────────────────────
